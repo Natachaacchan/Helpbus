@@ -1,0 +1,201 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HelpBus — Map</title>
+
+  <link rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    /* ===========================
+   DARK - apenas SIDEBAR (map.html)
+   =========================== */
+.sidebar {
+  background: #16131a !important;       /* painel escuro */
+  border-right: 1px solid rgba(255,255,255,0.03) !important;
+  color: #f2f2f2 !important;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.6) !important;
+}
+
+.sidebar h2, .sidebar .title, .sidebar .stop-name {
+  color: #ffffff !important;
+}
+
+.sidebar .muted, .sidebar .label, .sidebar .small {
+  color: #bfbcc6 !important;  /* texto secundário */
+}
+
+/* estatísticas */
+.stat {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.04)) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255,255,255,0.02) !important;
+}
+
+/* bloco de destaque do ponto próximo */
+.highlight {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.04)) !important;
+  border: 1px solid rgba(255,255,255,0.02) !important;
+  color: #f2f2f2 !important;
+}
+
+/* lista próximas paradas */
+.next-stops { margin-top:14px; }
+.next-item {
+  background: #1e1b25 !important;
+  border: 1px solid rgba(255,255,255,0.03) !important;
+  color: #fff !important;
+}
+.next-item .idx {
+  background: linear-gradient(180deg,#8a63d2,#6A1B9A) !important;
+  color: #fff !important;
+}
+.next-item .name { color:#fff !important; }
+.next-item .meta { color:#bfbcc6 !important; }
+
+/* lista completa de paradas */
+#fullStopsList { margin-top:12px; display:flex; flex-direction:column; gap:8px; }
+.stop-row {
+  background: #1e1b25 !important;
+  border: 1px solid rgba(255,255,255,0.03) !important;
+  color: #fff !important;
+}
+.stop-row .stop-type { color: #bfbcc6 !important; }
+
+/* botões */
+#btnBack, .action-wrap button, #btnAction {
+  background: transparent !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,0.06) !important;
+}
+#btnAction {
+  background: linear-gradient(180deg,#8a63d2,#6A1B9A) !important;
+  color: #fff !important;
+  border: 0 !important;
+}
+
+/* Leaflet popup tweaks para legibilidade no dark */
+.leaflet-popup-content-wrapper { background:#1e1b25 !important; color:#fff !important; }
+.leaflet-popup-tip { background:#1e1b25 !important; }
+
+/* responsivo — mantém o visual no mobile */
+@media (max-width:720px){
+  .sidebar { background:#16131a !important; }
+  .stat { background: rgba(255,255,255,0.02) !important; }
+}
+
+    body, html, #map {
+      height:100%;
+      margin:0;
+      padding:0;
+      font-family:Poppins, sans-serif;
+    }
+
+    .layout {
+      display:flex;
+      height:100vh;
+    }
+
+    .sidebar {
+      width:380px;
+      max-width:40%;
+      background:#fff;
+      border-right:1px solid #eee;
+      overflow:auto;
+      padding:18px;
+      box-sizing:border-box;
+    }
+
+    .mapwrap {
+      flex:1;
+      position:relative;
+    }
+
+    #map {
+      width:100%;
+      height:100%;
+    }
+
+    .stat {
+      display:inline-block;
+      padding:10px 14px;
+      border-radius:12px;
+      margin-right:8px;
+      background:#f8f6fb;
+      font-weight:700;
+    }
+
+    .next-stops {
+      margin-top:12px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <h2 id="routeNumber">Linha</h2>
+          <div id="routeName" style="color:#666;margin-top:-6px"></div>
+        </div>
+        <button id="btnBack"
+                style="border:0;background:#f3f3f3;padding:8px;border-radius:10px">
+          Voltar
+        </button>
+      </div>
+
+      <div style="margin-top:12px" class="stats-row">
+        <div class="stat">
+          <div style="font-size:12px;color:#666">Distância</div>
+          <div id="statDistanceValue" style="font-size:18px">-- km</div>
+        </div>
+
+        <div class="stat">
+          <div style="font-size:12px;color:#666">Tempo</div>
+          <div id="statTimeValue" style="font-size:18px">-- min</div>
+        </div>
+      </div>
+
+      <div style="
+        margin-top:14px;padding:12px;background:#fff;border-radius:12px;
+        border:1px solid #f1f1f1"
+      >
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="width:10px;height:10px;border-radius:50%;background:#6A1B9A"></div>
+          <div style="font-weight:700">Ponto mais próximo</div>
+        </div>
+
+        <div id="nearestStopText" style="color:#666;margin-top:8px">--</div>
+      </div>
+
+      <div id="nextStopsBlock" class="next-stops"></div>
+
+      <div style="position:sticky;bottom:18px;margin-top:18px">
+        <button id="btnAction"
+                style="width:100%;padding:12px;border-radius:12px;background:#6A1B9A;color:#fff;border:0">
+          Ir para o ponto
+        </button>
+      </div>
+
+    </div>
+
+    <!-- MAP -->
+    <div class="mapwrap">
+      <div id="map"></div>
+    </div>
+
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/map.js"></script>
+
+</body>
+</html>
+
