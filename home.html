@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HelpBus — Home</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ============================
+       HELPBUS — DARK THEME (coerente)
+       ============================ */
+
+    :root{
+      --bg: #141218;
+      --panel: #1e1b25;
+      --muted-panel: #212026;
+      --card: #1b1820;
+      --surface: #121014;
+      --text: #F2F2F2;
+      --muted: #c7c7c7;
+      --accent-purple: #6A1B9A;
+      --accent-purple-600: #8a63d2;
+      --accent-orange: #FF9800;
+      --shadow: 0 10px 30px rgba(0,0,0,0.6);
+      --glass: rgba(255,255,255,0.02);
+    }
+
+    /* base */
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:"Poppins",sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+    a{color:inherit}
+    .container{ width:95%; max-width:1400px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:40px; padding:30px 0; align-items:start; }
+
+    /* header */
+    .header{ grid-column:1 / 3; display:flex; align-items:center; gap:20px; }
+    .header img{ width:65px; border-radius:12px; background:linear-gradient(180deg,var(--accent-purple),#4A148C); padding:8px; box-shadow:var(--shadow) }
+    .header-title h1{ margin:0; font-size:32px; color:var(--text) }
+    .header-title p{ margin:0; color:var(--muted) }
+
+    /* left column layout */
+    .left-col{ display:flex; flex-direction:column; gap:18px; }
+
+    /* form card */
+    .form-box{
+      background:linear-gradient(180deg,var(--panel),#171417);
+      padding:22px;
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      border:1px solid rgba(255,255,255,0.02);
+    }
+    .input-row{ display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+    .input-row input{
+      flex:1;
+      padding:12px 16px;
+      border-radius:40px;
+      border:1px solid rgba(255,255,255,0.04);
+      background:transparent;
+      color:var(--text);
+      font-size:15px;
+      outline: none;
+      transition: box-shadow .12s ease, border-color .12s ease;
+    }
+    .input-row input::placeholder{ color: rgba(242,242,242,0.45); }
+    .input-row input:focus{ box-shadow: 0 6px 18px rgba(106,27,154,0.08); border-color: rgba(138,99,210,0.28) }
+
+    .btn-go{
+      padding:10px 16px; border-radius:40px; border:0; color:white; font-weight:700; cursor:pointer; min-width:64px;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.6);
+      transition: transform .08s ease, box-shadow .12s ease;
+    }
+    .btn-go:active{ transform: translateY(1px) }
+    .btn-purple{ background: linear-gradient(180deg,var(--accent-purple),var(--accent-purple-600)); }
+    .btn-orange{ background: linear-gradient(180deg,var(--accent-orange), #ff7a00); }
+
+    .small{ font-size:13px; color:var(--muted); }
+
+    /* suggestions block (inserted dynamically) */
+    #suggestionsBlock{ margin-top:12px; }
+
+    /* list card (recent + fav) */
+    .list-card{
+      background: linear-gradient(180deg,var(--panel), #161217);
+      padding:18px; border-radius:14px; box-shadow:var(--shadow); border:1px solid rgba(255,255,255,0.02);
+    }
+    .list-card h2{ margin:0 0 12px 0; font-size:18px; color:var(--text); }
+
+    .recent-item, .fav-item{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:10px; padding:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;
+      border-left:6px solid rgba(106,27,154,0.1);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
+    .recent-item .meta{ font-weight:700; color:var(--text) }
+    .recent-sub{ font-size:13px; color:var(--muted); margin-top:6px; }
+    .recent-item button, .fav-item button{ background:transparent; border:0; color:var(--accent-purple-600); cursor:pointer }
+
+    /* RIGHT column */
+    .right-col{ display:flex; flex-direction:column; gap:18px; }
+    .info-card{
+      background: linear-gradient(180deg,var(--panel), #161217);
+      padding:28px; border-radius:18px; height:300px; box-shadow:var(--shadow);
+      display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; border:1px solid rgba(255,255,255,0.02);
+    }
+    .info-card img{ width:140px; opacity:0.95; border-radius:8px; box-shadow:0 8px 20px rgba(0,0,0,0.5) }
+    .info-card h3{ margin:14px 0 6px 0; font-size:22px; color:var(--text) }
+    .info-card p{ color:var(--muted); margin:0; max-width:420px }
+
+    .feedback-card{
+      background: linear-gradient(180deg,var(--panel), #171417);
+      padding:18px; border-radius:14px; box-shadow:var(--shadow);
+      border:1px solid rgba(255,255,255,0.02);
+    }
+    .feedback-card h3{ margin:0 0 10px 0; color:var(--text) }
+    .feedback-card textarea{
+      width:100%; min-height:120px; resize:vertical; padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.04);
+      background:transparent; color:var(--text); font-family:inherit;
+    }
+    .feedback-row{ display:flex; gap:10px; margin-top:10px; align-items:center; justify-content:space-between; }
+    .feedback-actions input{ padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:var(--text) }
+    #feedbackStatus{ color:#8BC34A; display:none }
+
+    /* smaller screens */
+    @media (max-width:980px){
+      .container{ grid-template-columns: 1fr; padding:18px; gap:18px; }
+      .header{ grid-column:1; }
+      .info-card{ height:auto; }
+      .header img{ width:54px }
+      .input-row input{ font-size:14px }
+    }
+
+    /* small neat helpers */
+    .muted-note{ font-size:13px; color:var(--muted); margin-top:8px; }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- header -->
+    <div class="header">
+      <img src="img/slogan.png" alt="slogan.png" onerror="this.style.opacity=0.35">
+      <div class="header-title">
+        <h1>HelpBus</h1>
+        <p>Seu caminho, nossa missão</p>
+      </div>
+    </div>
+
+    <!-- LEFT: inputs + destinos (top) + favoritos (bottom) -->
+    <div class="left-col">
+      <!-- inputs -->
+      <div class="form-box">
+        <div class="input-row">
+          <input id="originInput" placeholder="Origem..." autocomplete="off" />
+          <button class="btn-go btn-purple" id="goOriginBtn">GO</button>
+        </div>
+        <div class="input-row">
+          <input id="destInput" placeholder="Destino..." autocomplete="off" />
+          <button class="btn-go btn-orange" id="goDestBtn">GO</button>
+        </div>
+        <div class="muted-note">Dica: escreva "Rua, Praça ou Bairro, Cidade" (ex.: Praça XV, Florianópolis)</div>
+      </div>
+
+      <!-- DESTINOS (recentes) — acima -->
+      <div class="list-card" id="recentCard">
+        <h2>Destinos recentes</h2>
+        <div id="recentList">
+          <div class="empty-text" style="color:var(--muted)">Nenhuma busca recente</div>
+        </div>
+      </div>
+
+      <!-- FAVORITOS — abaixo -->
+      <div class="list-card" id="favCard" style="margin-top:6px;">
+        <h2>Favoritos</h2>
+        <div id="favList">
+          <div class="empty-text" style="color:var(--muted)">Nenhum favorito</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: info + feedback -->
+    <div class="right-col">
+      <div class="info-card">
+        <img src="img/mapa.jpg" alt="logo" onerror="this.style.opacity=0.8">
+        <h3>Veja sua rota no mapa</h3>
+        <p>Ao pesquisar um destino real você verá linhas sugeridas; selecione uma linha e será direcionado para a tela de mapa com a rota pronta.</p>
+      </div>
+
+      <div class="feedback-card">
+        <h3>Feedback — Ajude a melhorar</h3>
+        <div class="small">Conte como foi sua experiência ao testar o protótipo (problemas, sugestões, dispositivo usado).</div>
+        <textarea id="feedbackText" placeholder="Escreva seu feedback..."></textarea>
+        <div class="feedback-row">
+          <div class="small">Seu e‑mail (opcional)</div>
+          <div class="feedback-actions">
+            <input id="feedbackEmail" placeholder="nome@exemplo.com">
+            <button id="sendFeedback" class="btn-go btn-purple">Enviar</button>
+          </div>
+        </div>
+        <div id="feedbackStatus" class="small" style="margin-top:8px;color:#8BC34A;display:none;">Feedback enviado — obrigado!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- seu script original (sem mudanças) -->
+  <script>
+  (function(){
+    // LocalStorage keys
+    const REC_KEY = 'helpbus_recents_v1';
+    const FAV_KEY = 'helpbus_favs_v1';
+    const FB_KEY  = 'helpbus_feedbacks_v1';
+    // helpers
+    const $ = id => document.getElementById(id);
+    function load(key){ try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch(e){ return []; } }
+    function save(key, arr){ localStorage.setItem(key, JSON.stringify(arr)); }
+    // render recents
+    function renderRecents(){
+      const root = $('recentList');
+      const list = load(REC_KEY);
+      root.innerHTML = '';
+      if(!list.length){ root.innerHTML = '<div class="empty-text">Nenhuma busca recente</div>'; return; }
+      for(const r of list){
+        const div = document.createElement('div');
+        div.className = 'recent-item';
+        div.innerHTML = `<div>
+                           <div class="meta">${escapeHtml(r.destination || r.text || '—')}</div>
+                           <div class="recent-sub">${escapeHtml(r.origin || '')}</div>
+                         </div>
+                         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+                           <div style="font-size:12px;color:var(--muted)">${r.time || ''}</div>
+                           <button style="background:transparent;border:0;color:var(--accent-purple-600);cursor:pointer" onclick="repeatRecent(event, '${encodeURIComponent(r.destination||r.text||'')}')">Abrir</button>
+                         </div>`;
+        root.appendChild(div);
+      }
+    }
+    window.repeatRecent = function(ev, destEnc){
+      ev.stopPropagation();
+      const dest = decodeURIComponent(destEnc);
+      $('destInput').value = dest;
+      handleSearchAndShowLines(false);
+    };
+    // render favs
+    function renderFavs(){
+      const root = $('favList');
+      const favs = load(FAV_KEY);
+      root.innerHTML = '';
+      if(!favs.length){ root.innerHTML = '<div class="empty-text">Nenhum favorito</div>'; return; }
+      for(const f of favs){
+        const div = document.createElement('div');
+        div.className = 'fav-item';
+        div.innerHTML = `<div style="text-align:left">
+                           <div style="font-weight:700">${escapeHtml(f.name)}</div>
+                           <div class="small">${escapeHtml(f.address || '')}</div>
+                         </div>
+                         <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+                           <button style="background:transparent;border:0;color:var(--accent-purple-600);cursor:pointer" onclick="useFav(event, '${encodeURIComponent(f.address||f.name)}')">Usar</button>
+                           <button style="background:transparent;border:0;color:#E05A4B;cursor:pointer" onclick="removeFav(event,'${encodeURIComponent(f.name)}')">Remover</button>
+                         </div>`;
+        root.appendChild(div);
+      }
+    }
+    window.useFav = function(ev, addrEnc){
+      ev.stopPropagation();
+      $('destInput').value = decodeURIComponent(addrEnc);
+      handleSearchAndShowLines(false);
+    };
+    window.removeFav = function(ev, nameEnc){
+      ev.stopPropagation();
+      const name = decodeURIComponent(nameEnc);
+      let favs = load(FAV_KEY);
+      favs = favs.filter(f => f.name !== name);
+      save(FAV_KEY, favs);
+      renderFavs();
+    };
+    // small sanitize
+    function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<>"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' })[c]); }
+    // add recent entry
+    function addRecent(obj){
+      if(!obj) return;
+      const cur = load(REC_KEY);
+      cur.unshift(obj);
+      // unique by destination+origin
+      const uniq = []; const out = [];
+      for(const r of cur){
+        const key = (r.destination||r.text||'') + '||' + (r.origin||'');
+        if(!uniq.includes(key)){ uniq.push(key); out.push(r); }
+        if(out.length>=12) break;
+      }
+      save(REC_KEY, out);
+      renderRecents();
+    }
+    // toggle favorite (simple)
+    function addFavorite(obj){
+      if(!obj || !obj.name) return;
+      const favs = load(FAV_KEY);
+      if(favs.find(f => f.name === obj.name)) return;
+      favs.push(obj);
+      save(FAV_KEY, favs);
+      renderFavs();
+    }
+    // feedback
+    function submitFeedback(){
+      const text = $('feedbackText').value.trim();
+      const email = $('feedbackEmail').value.trim();
+      if(!text){ alert('Escreva seu feedback antes de enviar.'); return; }
+      const all = load(FB_KEY);
+      all.unshift({ text, email, created: new Date().toISOString() });
+      save(FB_KEY, all);
+      $('feedbackText').value = '';
+      $('feedbackEmail').value = '';
+      $('feedbackStatus').style.display = 'block';
+      setTimeout(()=> $('feedbackStatus').style.display = 'none', 3500);
+    }
+    // search handling (uses Nominatim lookup when needed) and then renders "linhas sugeridas"
+    async function nominatimSearch(q, limit=4){
+      if(!q || q.length<2) return [];
+      try{
+        const url = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(q) + '&limit=' + limit + '&addressdetails=1';
+        const res = await fetch(url, { headers:{ 'Accept':'application/json' } });
+        if(!res.ok) return [];
+        const json = await res.json();
+        return json.map(i => ({ name: i.display_name, lat: parseFloat(i.lat), lon: parseFloat(i.lon) }));
+      }catch(e){ console.warn('nom err', e); return []; }
+    }
+    const MOCK_LINES = [
+      {
+        id:"330", number:"330", name:"TICEN - Costeira",
+        origin:"Terminal Centro (TICEN)", destination:"Costeira do Pirajubaé",
+        nearest_stop:"Praça XV - 50m", estimated_time:"35 min",
+        stops:[
+          { name:"TICEN", position:[-27.5954,-48.5480], order:1},
+          { name:"Praça XV de Novembro", position:[-27.5969,-48.5495], order:2},
+          { name:"Beiramar Shopping", position:[-27.5920,-48.5500], order:3},
+          { name:"CIC", position:[-27.5850,-48.5550], order:4},
+          { name:"Costeira do Pirajubaé", position:[-27.6100,-48.5650], order:5}
+        ]
+      },
+      {
+        id:"1224", number:"1224", name:"TICEN - Trindade",
+        origin:"Terminal Centro (TICEN)", destination:"Trindade",
+        nearest_stop:"Praça XV - 50m", estimated_time:"25 min",
+        stops:[
+          { name:"TICEN", position:[-27.5954,-48.5480], order:1},
+          { name:"Praça XV", position:[-27.5969,-48.5495], order:2},
+          { name:"UFSC", position:[-27.6000,-48.5200], order:3},
+          { name:"Trindade", position:[-27.6050,-48.5150], order:4}
+        ]
+      }
+    ];
+    // show suggestion box (simple block under inputs)
+    function clearSuggestionArea(){ const ex = document.getElementById('suggestionsBlock'); if(ex) ex.remove(); }
+    function renderLineSuggestions(lines, destCoord){
+      clearSuggestionArea();
+      const container = document.createElement('div');
+      container.id = 'suggestionsBlock';
+      container.style.marginTop = '12px';
+      container.style.padding = '12px';
+      container.style.background = 'linear-gradient(180deg,var(--panel), #161217)';
+      container.style.borderRadius = '12px';
+      container.style.boxShadow = '0 8px 22px rgba(0,0,0,0.6)';
+      container.style.border = '1px solid rgba(255,255,255,0.02)';
+      const title = document.createElement('div');
+      title.innerHTML = '<strong>Linhas sugeridas</strong>';
+      container.appendChild(title);
+      if(!lines || !lines.length){
+        const p = document.createElement('div'); p.className='small'; p.style.marginTop='8px'; p.textContent = 'Nenhuma linha sugerida para este destino.';
+        container.appendChild(p);
+      } else {
+        for(const ln of lines){
+          const el = document.createElement('div');
+          el.style.display='flex'; el.style.justifyContent='space-between'; el.style.alignItems='center';
+          el.style.padding='10px'; el.style.borderRadius='10px'; el.style.marginTop='8px'; el.style.border='1px solid rgba(255,255,255,0.02)';
+          el.innerHTML = `<div style="display:flex;gap:12px;align-items:center">
+                            <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(180deg,var(--accent-purple),#4A148C);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800">${escapeHtml(ln.number)}</div>
+                            <div>
+                              <div style="font-weight:700">${escapeHtml(ln.name)}</div>
+                              <div class="small">${escapeHtml(ln.origin)} → ${escapeHtml(ln.destination)}</div>
+                              <div class="small" style="color:var(--muted);margin-top:6px">Parada próxima: ${escapeHtml(ln.nearest_stop || '-')}</div>
+                            </div>
+                          </div>
+                          <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+                            <button style="padding:8px 12px;border-radius:8px;border:0;background:transparent;color:var(--accent-purple-600);cursor:pointer" onclick="favLine(event, '${encodeURIComponent(ln.number)}','${encodeURIComponent(ln.name)}','${encodeURIComponent(ln.destination)}')">★</button>
+                            <button style="padding:8px 12px;border-radius:8px;border:0;background:linear-gradient(180deg,var(--accent-purple),#4A148C);color:#fff;cursor:pointer" onclick="selectLine(event, '${encodeURIComponent(JSON.stringify(ln))}')">Ver rota</button>
+                          </div>`;
+          container.appendChild(el);
+        }
+      }
+      const formBox = document.querySelector('.form-box');
+      formBox.parentNode.insertBefore(container, formBox.nextSibling);
+    }
+    window.favLine = function(ev, numEnc, nameEnc, destEnc){
+      ev.stopPropagation();
+      const obj = { name: decodeURIComponent(nameEnc), address: decodeURIComponent(destEnc) || '', id: decodeURIComponent(numEnc) };
+      addFavorite(obj);
+      renderFavs();
+      alert('Adicionado aos Favoritos');
+    };
+    window.selectLine = function(ev, lineJsonEnc){
+      ev.stopPropagation();
+      const line = JSON.parse(decodeURIComponent(lineJsonEnc));
+      addRecent({
+        origin: $('originInput').value || 'Sua localização',
+        destination: $('destInput').value || line.destination,
+        bus_line_id: line.id || line.number,
+        bus_line_number: line.number,
+        time: new Date().toLocaleString()
+      });
+      const qs = '?line=' + encodeURIComponent(JSON.stringify(line));
+      window.location.href = 'map.html' + qs;
+    };
+    async function handleSearchAndShowLines(useNominatim=true){
+      const destText = $('destInput').value.trim();
+      if(!destText){ alert('Digite um destino'); return; }
+      let destCoord = null;
+      if(useNominatim){
+        const res = await nominatimSearch(destText, 4);
+        if(res && res.length){ destCoord = [res[0].lat, res[0].lon]; $('destInput').value = res[0].name; }
+      }
+      const suggestions = findLinesNearCoord(MOCK_LINES, destCoord, 900);
+      renderLineSuggestions(suggestions.length ? suggestions : MOCK_LINES, destCoord);
+      addRecent({ origin: $('originInput').value || 'Sua localização', destination: $('destInput').value, time: new Date().toLocaleTimeString() });
+    }
+    function haversine(a,b){ const toRad=v=>v*Math.PI/180; const R=6371000; const dLat=toRad(b[0]-a[0]); const dLon=toRad(b[1]-a[1]); const lat1=toRad(a[0]), lat2=toRad(b[0]); const h=Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)**2; return 2*R*Math.atan2(Math.sqrt(h), Math.sqrt(1-h)); }
+    function findLinesNearCoord(lines, coord, radiusMeters=800){
+      if(!coord) return lines;
+      const matches=[];
+      for(const line of lines){
+        const near = (line.stops||[]).filter(s=> haversine(coord, s.position) <= radiusMeters );
+        if(near.length) matches.push({ ...line, nearestStops: near, nearestDist: Math.min(...near.map(s=>haversine(coord, s.position))) });
+      }
+      matches.sort((a,b)=> (a.nearestDist||0) - (b.nearestDist||0));
+      return matches;
+    }
+    $('goDestBtn').addEventListener('click', ()=> handleSearchAndShowLines(true));
+    $('goOriginBtn').addEventListener('click', async ()=>{
+      const text = $('originInput').value.trim();
+      if(!text){ alert('Digite uma origem'); return; }
+      const res = await nominatimSearch(text, 1);
+      if(res && res.length) $('originInput').value = res[0].name;
+      else alert('Origem não encontrada — tente ser mais específico.');
+    });
+    function ensureDummyData(){
+      const cur = load(REC_KEY);
+      if(!cur.length){
+        addRecent({ origin:'TICEN', destination:'Univali Kobrasol — São José', bus_line_number:'1224', time:'Hoje 21:16' });
+      }
+    }
+    $('sendFeedback').addEventListener('click', submitFeedback);
+    ensureDummyData();
+    renderRecents();
+    renderFavs();
+    window._hb = { load, save, addRecent, loadFav: ()=>load(FAV_KEY) };
+  })();
+  </script>
+</body>
+</html>
+
